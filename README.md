@@ -1,46 +1,38 @@
-# YOLOv11 Computer Vision Image Search
+# YOLOv11 Image Search Application
 
-A Streamlit application that turns object detection results into a searchable image gallery. The app runs YOLOv11 on a folder of images, saves the detections as JSON metadata, and lets you search for images by detected object classes such as `person`, `car`, `apple`, `bed`, or `baseball bat`.
+A Streamlit-based computer vision application that uses YOLOv11 object detection to index image collections and make them searchable by detected objects. The application processes images, stores detection metadata, and provides an interactive interface for filtering results by object class and object count.
 
-The project is built for quick computer vision experiments, dataset exploration, and demos where you need to answer questions like:
+It is designed for dataset exploration, object detection demonstrations, and visual search workflows where users need to locate images containing specific objects such as `person`, `car`, `apple`, `bed`, or `baseball bat`.
 
-- Which images contain a bed?
-- Which images contain either an apple or a baseball bat?
-- Which images contain all selected objects?
-- Which images contain a selected object no more than a chosen number of times?
+## Preview
 
-## Screenshots
-
-### Home screen
+### Home
 
 ![Home screen](docs/screenshots/app-home.png)
 
-### Search filters
+### Search Filters
 
 ![Search filters](docs/screenshots/search-ui.png)
 
-### Results overview
+### Results
 
 ![Results overview](docs/screenshots/results-overview.png)
-
-### Detection results
 
 ![Detection results](docs/screenshots/results-grid.png)
 
 ## Features
 
-- Process a complete image directory with YOLOv11 object detection.
-- Load existing metadata instead of running inference every time.
-- Search by one or more detected object classes.
-- Use `OR` mode to match any selected class.
-- Use `AND` mode to require every selected class.
-- Add optional maximum count thresholds per selected class.
-- Display matching images in a responsive grid.
-- Draw bounding boxes and confidence labels on detected objects.
-- Highlight only the classes used in the current search.
-- Change the number of result columns from the UI.
-- Export the current search results as JSON.
-- Run on CPU or GPU depending on the installed PyTorch setup.
+- Run YOLOv11 detection on a folder of images.
+- Save detection results into reusable JSON metadata.
+- Load existing metadata without running inference again.
+- Search images by one or more detected object classes.
+- Use `OR` search to match any selected class.
+- Use `AND` search to require all selected classes.
+- Add optional max-count filters for each selected class.
+- Display matching images in a responsive result grid.
+- Draw bounding boxes and confidence labels.
+- Highlight only the classes used in the search.
+- Export matching results as JSON.
 
 ## Tech Stack
 
@@ -50,8 +42,8 @@ The project is built for quick computer vision experiments, dataset exploration,
 - PyTorch
 - Pillow
 - PyYAML
-- Pandas and NumPy
 - OpenCV headless
+- Pandas and NumPy
 
 ## Project Structure
 
@@ -67,7 +59,7 @@ Yolov11_Image_search/
 |   |-- inference.py
 |   `-- utils.py
 |-- coco-val-2017-500/
-|   `-- sample image dataset
+|   `-- sample images
 |-- data/
 |   `-- processed/
 |       `-- coco-val-2017-500/
@@ -80,95 +72,63 @@ Yolov11_Image_search/
     `-- streamlit_basics.py
 ```
 
-### Important Files
+## Core Files
 
-| File | Purpose |
+| File | Description |
 | --- | --- |
-| `app.py` | Main Streamlit application. Handles UI, searching, result display, bounding boxes, and JSON export. |
-| `src/inference.py` | Wraps Ultralytics YOLO inference and converts model predictions into metadata records. |
-| `src/utils.py` | Saves metadata, loads metadata, and builds class/count filter options. |
-| `src/config.py` | Loads and saves YAML configuration. |
-| `configs/default.yaml` | Stores model confidence threshold and supported image extensions. |
-| `data/processed/coco-val-2017-500/metadata.json` | Ready-to-load metadata for the included sample image folder. |
-| `coco-val-2017-500/` | Included sample image dataset used for demos. |
-| `yolo11m.pt` | YOLOv11 model weights used by default. |
+| `app.py` | Main Streamlit interface for processing, searching, displaying, and exporting results. |
+| `src/inference.py` | Runs YOLOv11 inference and creates detection metadata. |
+| `src/utils.py` | Loads/saves metadata and prepares class/count filter options. |
+| `src/config.py` | Loads YAML configuration. |
+| `configs/default.yaml` | Stores confidence threshold and supported image extensions. |
+| `data/processed/coco-val-2017-500/metadata.json` | Ready-to-use metadata for the included sample images. |
+| `coco-val-2017-500/` | Sample image dataset included for validation and demonstration. |
 
 ## Requirements
 
-Recommended setup:
+Recommended environment:
 
 - Python 3.11
-- Windows, macOS, or Linux
-- At least 4 GB RAM for small demos
-- More RAM and a GPU for larger image folders
-- Optional NVIDIA GPU with a CUDA-compatible PyTorch install
+- 4 GB RAM minimum for small datasets
+- NVIDIA GPU optional, but useful for larger datasets
 
-CPU works fine for the included 500 image demo, but GPU inference is much faster for larger datasets.
+The application can run on CPU. If CUDA-enabled PyTorch is installed, the inference module automatically uses GPU.
 
 ## Installation
 
-### 1. Clone the repository
+Clone the repository and move into the project folder:
 
 ```bash
-git clone <your-repository-url>
+git clone <repository-url>
 cd Yolov11_Image_search
 ```
 
-### 2. Create and activate a virtual environment
+Create a virtual environment:
 
-Windows PowerShell:
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows:
 
 ```powershell
-python -m venv .venv
 .\.venv\Scripts\activate
 ```
 
-macOS or Linux:
+Activate it on macOS/Linux:
 
 ```bash
-python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install dependencies
+Install dependencies:
 
 ```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-If PyTorch does not install correctly for your machine, install PyTorch from the official selector for your CPU or CUDA version first, then run `pip install -r requirements.txt` again.
-
-## Conda Setup
-
-If you prefer Conda, use one of these setups.
-
-### CPU environment
-
-```bash
-conda create -n yolo_image_search python=3.11 -y
-conda activate yolo_image_search
-pip install -r requirements.txt
-```
-
-### GPU environment
-
-```bash
-conda create -n yolo_image_search_gpu python=3.11 -y
-conda activate yolo_image_search_gpu
-conda install pytorch==2.5.1 torchvision==0.20.1 pytorch-cuda=12.4 -c pytorch -c nvidia
-pip install -r requirements.txt
-```
-
-Check whether PyTorch can see your GPU:
-
-```bash
-python -c "import torch; print(torch.cuda.is_available())"
-```
-
-If it prints `True`, the app should use GPU automatically.
-
-## Running the App
+## Usage
 
 Start Streamlit from the project root:
 
@@ -176,110 +136,81 @@ Start Streamlit from the project root:
 streamlit run app.py
 ```
 
-Streamlit usually opens this URL automatically:
+Open the local URL shown in the terminal, usually:
 
 ```text
 http://localhost:8501
 ```
 
-To use a custom port:
+To run on another port:
 
 ```bash
 streamlit run app.py --server.port 8080
 ```
 
-## Fast Demo With Included Metadata
+## Sample Dataset Workflow
 
-Use this path if you want to try the app immediately without re-running YOLO inference:
+The repository includes sample images and pre-generated metadata, allowing the application to be tested without running inference first.
+
+1. Run the app:
+
+```bash
+streamlit run app.py
+```
+
+2. Select `Load existing metadata`.
+3. Enter this metadata path:
 
 ```text
 data/processed/coco-val-2017-500/metadata.json
 ```
 
-Steps:
-
-1. Run the app with `streamlit run app.py`.
-2. Select `Load existing metadata`.
-3. Paste `data/processed/coco-val-2017-500/metadata.json`.
 4. Click `Load Metadata`.
-5. In `Classes to search for`, select classes such as `apple`, `baseball bat`, and `bed`.
-6. Keep search mode as `Any of selected classes (OR)`.
-7. Click `Search Images`.
+5. Select classes such as:
 
-With the included sample metadata, the `apple`, `baseball bat`, and `bed` example returns 21 matching images.
+```text
+apple, baseball bat, bed
+```
 
-## Processing Your Own Images
+6. Click `Search Images`.
 
-Use this when you want to create fresh metadata for a new image folder.
+With the included sample metadata, searching for `apple`, `baseball bat`, and `bed` in OR mode returns 21 matching images.
 
-1. Put your images in a folder.
-2. Run the app.
-3. Select `Process new images`.
-4. Enter the image folder path.
-5. Enter the model weights path, usually:
+## Processing Custom Images
+
+To generate metadata for a custom image folder:
+
+1. Select `Process new images`.
+2. Enter the image directory path.
+3. Enter the model path:
 
 ```text
 yolo11m.pt
 ```
 
-6. Click `Start Inference`.
-7. Wait for processing to complete.
-8. The app shows where the new `metadata.json` file was saved.
-9. Use the search panel that appears after processing.
+4. Click `Start Inference`.
+5. Wait for inference to complete.
+6. Use the generated metadata in the search interface.
 
-Supported image extensions are configured in `configs/default.yaml`:
+Supported image formats are controlled in `configs/default.yaml`:
 
 ```yaml
 data:
   image_extension: [".jpg", ".jpeg", ".png"]
 ```
 
-## Recommended Data Layout
+## Search Modes
 
-For repeatable projects, keep raw and processed data in a simple structure:
+| Mode | Behavior |
+| --- | --- |
+| `Any of selected classes (OR)` | Shows images containing at least one selected class. |
+| `All selected classes (AND)` | Shows only images containing every selected class. |
 
-```text
-data/
-|-- raw/
-|   `-- my-images/
-|       |-- image_001.jpg
-|       `-- image_002.jpg
-`-- processed/
-    `-- my-images/
-        `-- metadata.json
-```
+Count thresholds are optional. For example, searching for `person` with a max count of `2` returns images with one or two detected people and excludes images with higher counts.
 
-Then process:
+## Metadata Format
 
-```text
-data/raw/my-images
-```
-
-The app saves metadata under the matching processed folder.
-
-## How the App Works
-
-### 1. Inference
-
-`src/inference.py` loads the YOLO model and runs detection on each supported image file:
-
-```python
-inferencer = YOLOv11Inference("yolo11m.pt")
-metadata = inferencer.process_directory("path/to/images")
-```
-
-Each image becomes one metadata record with:
-
-- `image_path`: path to the source image
-- `detections`: list of detected objects
-- `class`: detected object name
-- `confidence`: model confidence score
-- `bbox`: bounding box coordinates in `[x1, y1, x2, y2]` format
-- `total_objects`: total detections in the image
-- `unique_class`: unique detected classes
-- `class_counts`: count of each detected class
-
-Example metadata shape:
+Each processed image is saved as a JSON object like this:
 
 ```json
 {
@@ -300,45 +231,9 @@ Example metadata shape:
 }
 ```
 
-### 2. Metadata Loading
-
-`src/utils.py` loads the JSON metadata and extracts:
-
-- every unique class available in the dataset
-- possible object count options for each class
-
-That is how the class dropdown and count threshold dropdowns are built.
-
-### 3. Search
-
-Search behavior is controlled by the selected mode:
-
-| Mode | Meaning |
-| --- | --- |
-| `Any of selected classes (OR)` | Show an image if it contains at least one selected class. |
-| `All selected classes (AND)` | Show an image only if it contains every selected class. |
-
-Count thresholds are optional. If you choose a maximum count for a class, the image must contain that class at least once and no more than the chosen number.
-
-Example:
-
-- Search class: `person`
-- Max count: `2`
-- Result: images with 1 or 2 detected people are shown, images with 3 or more people are hidden.
-
-### 4. Results Display
-
-The result grid opens each matching image with Pillow and draws detections:
-
-- green boxes for classes included in the current search
-- labels with class name and confidence score
-- optional hiding of non-matching classes
-- adjustable grid columns
-- JSON export of the current results
-
 ## Configuration
 
-Edit `configs/default.yaml` to change model behavior:
+Edit `configs/default.yaml` to tune detection behavior:
 
 ```yaml
 model:
@@ -349,35 +244,22 @@ data:
   image_extension: [".jpg", ".jpeg", ".png"]
 ```
 
-Common changes:
+Increase `conf_threshold` for fewer, higher-confidence detections. Decrease it to include more possible detections.
 
-- Increase `conf_threshold` to show fewer but more confident detections.
-- Decrease `conf_threshold` to show more detections, including lower-confidence ones.
-- Add more image extensions if your dataset uses other formats.
+## Export Results
 
-## Exporting Results
-
-After a search:
+After searching:
 
 1. Open `Export Options`.
 2. Click `Download Results (JSON)`.
-3. The downloaded JSON contains only the images that matched your current search.
 
-This is useful if you want to pass matching image paths into another script or build a smaller dataset from the search results.
+The exported JSON contains only the records that matched the current search.
 
 ## Troubleshooting
 
-### `ModuleNotFoundError`
+### `streamlit` command not found
 
-Your virtual environment is probably not active, or dependencies were not installed.
-
-```bash
-pip install -r requirements.txt
-```
-
-### Streamlit command not found
-
-Run Streamlit through Python:
+Use:
 
 ```bash
 python -m streamlit run app.py
@@ -385,83 +267,31 @@ python -m streamlit run app.py
 
 ### Metadata loads but images do not display
 
-Metadata stores image paths. If the metadata was created on another computer or after moving folders, those paths may be invalid.
-
-Fix it by either:
-
-- regenerating metadata with `Process new images`, or
-- editing `image_path` values in the metadata so they point to existing images.
-
-The included sample metadata uses repo-relative paths so it works from the project root.
+Metadata records contain image paths. If images were moved after metadata generation, regenerate the metadata or update the `image_path` values in the JSON file.
 
 ### No images are processed
 
 Check that:
 
 - the image folder path is correct
-- images use `.jpg`, `.jpeg`, or `.png`
-- the app is being run from the project root
-- the folder is not empty
+- the folder contains `.jpg`, `.jpeg`, or `.png` files
+- the application is being run from the project root
 
-### CUDA is not being used
+### GPU is not detected
 
-Run:
+Check CUDA availability:
 
 ```bash
-nvidia-smi
 python -c "import torch; print(torch.cuda.is_available())"
 ```
 
-If PyTorch prints `False`, install the CUDA build of PyTorch that matches your system.
+If it prints `False`, install the correct CUDA-enabled PyTorch build for your system.
 
-### Model file not found
+## Notes
 
-Make sure the model weights path is correct. The default project path is:
-
-```text
-yolo11m.pt
-```
-
-## Development Notes
-
-Run the main app:
-
-```bash
-streamlit run app.py
-```
-
-Run the small Streamlit practice file:
-
-```bash
-streamlit run test/streamlit_basics.py
-```
-
-There is no full automated test suite yet. A good manual smoke test is:
-
-1. Start the app.
-2. Load `data/processed/coco-val-2017-500/metadata.json`.
-3. Search for `apple`, `baseball bat`, and `bed`.
-4. Confirm that 21 matching images are shown.
-5. Toggle bounding boxes and export JSON.
-
-## GitHub Push Checklist
-
-Before pushing:
-
-```bash
-git status
-git add README.md requirements.txt data/processed/coco-val-2017-500/metadata.json docs/screenshots/
-git commit -m "Add professional README and screenshots"
-git push
-```
-
-Recommended cleanup before publishing:
-
-- Add a license file if you want others to reuse the project.
-- Avoid committing virtual environments such as `.venv/`.
-- Avoid committing generated cache folders such as `__pycache__/`.
-- Keep large custom datasets outside Git unless they are small demo samples.
+- The included `metadata.json` uses repository-relative image paths for easier setup.
+- The included `yolo11m.pt` file is the default model weights file.
 
 ## License
 
-No license file is currently included. Add a license before publishing if you want to define how other people can use, modify, or distribute this project.
+No license file is currently included. Add one if you want to define how others can use or modify this project.
